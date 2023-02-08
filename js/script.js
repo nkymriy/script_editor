@@ -68,7 +68,6 @@ function updateTable() {
 		$(this).data("enabled", $checked.is(":checked"));
 		$(this).data("title", $title.val());
 		$(this).data("command", $command.val());
-		console.log($(this).data())
 		$id.text(index);
 		index += 1;
 	});
@@ -105,9 +104,15 @@ function tableToDict() {
 
 	let commands = [];
 	$("#command-table").find(".row").each(function () {
-		commands.push($(this).data());
+		let rowData = $(this).data();
+		let data = {
+			"id":rowData.id,
+			"enabled":rowData.enabled,
+			"title":rowData.title,
+			"command":rowData.command
+		}
+		commands.push(data);
 	});
-	console.log(commands);
 	dict["commands"] = commands;
 	return dict;
 }
@@ -139,9 +144,7 @@ function readJson() {
 
 
 function downloadJsonFile(){
-	const blob = new Blob([JSON.stringify(jsonData)], {
-		type: "application/json"
-	});
+	const blob = new Blob([JSON.stringify(jsonData)]);
 
 	const link = document.createElement('a');
 	link.download = 'data.json';
@@ -149,14 +152,16 @@ function downloadJsonFile(){
 	link.click();
 }
 
+
 async function updateJsonFile(){
+
 	[fileHandle] = await window.showOpenFilePicker({types:[{accept:{"text/json":[".json"]}}]});
 	const file = await fileHandle.getFile();
 	// const fileContents = await file.text();
 	const writable = await fileHandle.createWritable();
-	console.log(jsonData)
-
+	// jsonData = "test"
 	await writable.write(JSON.stringify(jsonData));
+	// await writable.write(jsonData);
 	await writable.close();
 }
 
