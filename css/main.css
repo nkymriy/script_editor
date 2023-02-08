@@ -1,0 +1,35 @@
+.wrapper {
+	display: flex;
+}
+
+.column {
+	width: 50%;
+	height: 100vh;
+	border: 5px double lightsteelblue;
+}
+
+.left-column {
+	background-color: lightcyan;
+}
+
+.right-column {
+	background-color: black;
+	color: white;
+}
+
+.console-space {
+	padding-left: 10px;
+}
+
+#command-table {
+	padding: 2rem;
+}
+
+table {
+	border-spacing: 1px;
+}
+
+td,
+th {
+	border: 1px black solid;
+}

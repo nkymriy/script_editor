@@ -5,46 +5,58 @@
 	<script src="js/import/jquery-3.6.3.min.js"></script>
 	<script src="js/import/jquery-ui-1.13.2/jquery-ui.js"></script>
 	<script src="js/script.js"></script>
+	<link rel="stylesheet" href="css/main.css">
 </head>
 
 <body>
-	テストボタン→<input type="button" id="test-button" value="test">
-	<table>
-		<thead>
-			<tr>
-				<th>No.</th>
-				<th>タイトル</th>
-				<th>備考</th>
-			</tr>
-		</thead>
-		<tbody class="sortable-list">
-			<tr data-no="1">
-				<th>1</th>
-				<td data-type="text">テストA</td>
-				<td>おはよう</td>
-			</tr>
-			<tr data-no="2">
-				<th>2</th>
-				<td data-type="text">テストB</td>
-				<td>こんにちは</td>
-			</tr>
-			<tr data-no="3">
-				<th>3</th>
-				<td data-type="text">テストC</td>
-				<td>ごきげんよう</td>
-			</tr>
-			<tr data-no="4">
-				<th>4</th>
-				<td data-type="text">テストD</td>
-				<td>こんばんは</td>
-			</tr>
-			<tr data-no="5">
-				<th>5</th>
-				<td data-type="text">テストE</td>
-				<td>おやすみ</td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="wrapper">
+		<div class="column left-column">
+			ファイルに出力する→<input type="checkbox" id="is-output-file" checked><br>
+			ファイル名:<input type="text" id="output-file-name" value="sample.log">
+			<div id="table-wrapper">
+				<table id="command-table">
+					<thead>
+						<tr>
+							<th>No.</th>
+							<th>タイトル</th>
+							<th>備考</th>
+						</tr>
+					</thead>
+					<tbody class="sortable-list">
+						<tr data-no="1">
+							<th data-type="no">1</th>
+							<td data-type="text">テストA</td>
+							<td data-type="command">echo "test"</td>
+						</tr>
+						<tr data-no="2">
+							<th data-type="no">2</th>
+							<td data-type="text">テストB</td>
+							<td data-type="command">ifconfig</td>
+						</tr>
+						<tr data-no="3">
+							<th data-type="no">3</th>
+							<td data-type="text">テストC</td>
+							<td data-type="command">df -h</td>
+						</tr>
+						<tr data-no="4">
+							<th data-type="no">4</th>
+							<td data-type="text">テストD</td>
+							<td data-type="command">hostname</td>
+						</tr>
+						<tr data-no="5">
+							<th data-type="no">5</th>
+							<td data-type="text">テストE</td>
+							<td data-type="command">uname -r</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="column right-column">
+			<p class="console-space">
+			</p>
+		</div>
+	</div>
 </body>
 
 </html>
