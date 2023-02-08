@@ -1,5 +1,29 @@
 {
-	"data":[
-		
+	"data": [
+		{
+			"os": "RHEL8.6",
+			"commands": [
+				{
+					"id": 1,
+					"title": "日付",
+					"command": "date"
+				},
+				{
+					"id": 2,
+					"title": "OS情報",
+					"command": "cat /etc/system-release"
+				},
+				{
+					"id": 3,
+					"title": "カーネルバージョン",
+					"command": "uname -r"
+				},
+				{
+					"id": 4,
+					"title": "ホスト名",
+					"command": "hostname"
+				}
+			]
+		}
 	]
 }
