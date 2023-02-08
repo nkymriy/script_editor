@@ -4,15 +4,18 @@
 	<meta charaset="utf-8">
 	<script src="js/import/jquery-3.6.3.min.js"></script>
 	<script src="js/import/jquery-ui-1.13.2/jquery-ui.js"></script>
+	<script src="js/import/jquery-toast-plugin/jquery.toast.min.js"></script>
 	<script src="js/script.js"></script>
 	<link rel="stylesheet" href="css/main.css">
+	<link rel="stylesheet" href="js/import/jquery-ui-1.13.2/jquery-ui.css">
+	<link rel="stylesheet" href="js/import/jquery-toast-plugin/jquery.toast.min.css">
 </head>
 
 <body>
 	<div class="wrapper">
 		<div class="column left-column">
 			ファイルに出力する→<input type="checkbox" id="is-output-file" checked><br>
-			ファイル名:<input type="text" id="output-file-name" value="sample.log">
+			ファイル名:<input type="text" id="output-file-name" value="sample.log"><br>
 			<div id="table-wrapper">
 				<table id="command-table">
 					<thead>
@@ -27,6 +30,8 @@
 					</tbody>
 				</table>
 			</div>
+			<input type="button" value="行追加" id="add-row-button">
+			<input type="button" value="保存" id="save-button">
 		</div>
 		<div class="column right-column">
 			<p class="console-space">
@@ -34,5 +39,4 @@
 		</div>
 	</div>
 </body>
-
 </html>
