@@ -26,7 +26,10 @@ function initialize() {
 	$("#add-row-button").on("click", function () { addRow(); });
 
 	$("#save-button").off("click");
-	$("#save-button").on("click", function () { saveJson(); });
+	$("#save-button").on("click", function () { saveJson(); downloadJsonFile(); });
+
+	$("#update-button").off("click");
+	$("#update-button").on("click", function () { saveJson(); updateJsonFile(); });
 
 	update()
 }
@@ -94,7 +97,6 @@ function saveJson() {
 			return false;
 		}
 	})
-	downloadJsonFile();
 }
 
 function tableToDict() {
@@ -138,13 +140,24 @@ function readJson() {
 
 function downloadJsonFile(){
 	const blob = new Blob([JSON.stringify(jsonData)], {
-		type: "application/text"
+		type: "application/json"
 	});
 
 	const link = document.createElement('a');
 	link.download = 'data.json';
 	link.href = URL.createObjectURL(blob);
 	link.click();
+}
+
+async function updateJsonFile(){
+	[fileHandle] = await window.showOpenFilePicker({types:[{accept:{"text/json":[".json"]}}]});
+	const file = await fileHandle.getFile();
+	// const fileContents = await file.text();
+	const writable = await fileHandle.createWritable();
+	console.log(jsonData)
+
+	await writable.write(JSON.stringify(jsonData));
+	await writable.close();
 }
 
 function toast(msg) {
