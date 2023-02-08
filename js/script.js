@@ -31,6 +31,9 @@ function initialize() {
 	$("#update-button").off("click");
 	$("#update-button").on("click", function () { saveJson(); updateJsonFile(); });
 
+	$("input[data-command='delete']").off("click");
+	$("input[data-command='delete']").on("click", function () { deleteRow($(this)); });
+
 	update()
 }
 
@@ -77,10 +80,11 @@ function addRow() {
 	let id = $(".row").length + 1
 	var tr =
 		`<tr data-id="${id}" data-enabled="true" class="row">
-			<th data-type="id" class="row">${id}</th>
+			<th data-type="id">${id}</th>
 			<td><input type="checkbox" data-type="enabled" checked></td>
 			<td><input type="textbox" data-type="title"></td>
 			<td><input type="textbox" data-type="command"></td>
+			<td><input type="button" data-command="delete" value="X"></td>
 		`
 	$(tr).appendTo($(".sortable-list"));
 	initialize();
@@ -89,6 +93,7 @@ function addRow() {
 
 function saveJson() {
 	let jsonItem = tableToDict();
+	console.log(jsonItem);
 	jsonData.items.forEach(function (item, index) {
 		if (item.os == "RHEL8.6") {
 			jsonData.items[index] = jsonItem;
@@ -131,6 +136,7 @@ function readJson() {
 					<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
 					<td><input type="textbox" data-type="title" value="${command.title}"></td>
 					<td><input type="textbox" data-type="command" value="${command.command}"></td>
+					<td><input type="button" data-command="delete" value="X"></td>
 				`
 					$(tr).appendTo($(".sortable-list"));
 					index += 1;
@@ -163,6 +169,10 @@ async function updateJsonFile(){
 	await writable.write(JSON.stringify(jsonData));
 	// await writable.write(jsonData);
 	await writable.close();
+}
+
+function deleteRow(object){
+	object.parent().parent().remove();
 }
 
 function toast(msg) {
