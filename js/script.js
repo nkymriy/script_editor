@@ -38,13 +38,14 @@ function initialize() {
 }
 
 function update() {
-	updateConsole();
 	updateTable();
+	updateConsole();
 }
 
 function updateConsole() {
 	$console = $(".console-space");
 	$console.text("");
+	let output_file = $("#output-file-name").val();
 	$(".sortable-list").children().each(function () {
 		// each内でreturn trueをするとContinue
 		if (!$(this).find("[data-type='enabled']").is(":checked")) {
@@ -53,13 +54,23 @@ function updateConsole() {
 
 		let command = "";
 		let isOutputFile = $("#is-output-file").is(":checked");
-		
-		// タイトル出力
-		if($("#is-echo-title").is(":checked")){
-			command += `echo '${$("#echo-title-before").val()}${$(this).find("[data-type='title']").val()}${$("#echo-title-after").val()}'`
+		let row = $(this).data();
+		// タイトルecho
+		if(row.title && $("#is-echo-title").is(":checked")){
+			command += `echo '${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}'`
 			// ファイル出力
 			if (isOutputFile) {
-				command += " >> " + $("#output-file-name").val();
+				command += " >> " + output_file;
+			}
+			command += `<br>`
+		}
+
+		// コマンドecho
+		if(row.command && $("#is-echo-command").is(":checked")){
+			command += `echo '${row.command}'`
+			// ファイル出力
+			if (isOutputFile) {
+				command += " >> " + output_file;
 			}
 			command += `<br>`
 		}
@@ -69,12 +80,15 @@ function updateConsole() {
 
 		// ファイル出力
 		if (isOutputFile) {
-			command += " >> " + $("#output-file-name").val();
+			command += " >> " + output_file;
 		}
 
-		// コマンド後の改行
-		if($("#is-after-newline").is(":checked")){
-			command += `<br>`.repeat($("#after-newline-count").val());
+		// 最終行の場合に改行 or 次行にタイトルが入力されている場合に改行
+		let nextRow = $(`[data-id='${row.id +1}']`).data();
+		if(!nextRow || nextRow && nextRow.title != ""){
+			if($("#is-after-newline").is(":checked")){
+				command += `<br>`.repeat($("#after-newline-count").val());
+			}
 		}
 		$console.html($console.html() + command + "<br>");
 	})
