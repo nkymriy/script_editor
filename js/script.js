@@ -1,5 +1,6 @@
 const jsonFile = 'data.json';
 let jsonData = {};
+let selectProfile;
 
 $(window).on("load", function () {
 	readJson();
@@ -34,6 +35,8 @@ function initialize() {
 	$("input[data-command='delete']").off("click");
 	$("input[data-command='delete']").on("click", function () { deleteRow($(this)); });
 
+	$("#profile-list").off("change");
+	$("#profile-list").on("change", function () { changeProfile() });
 	update()
 }
 
@@ -56,7 +59,7 @@ function updateConsole() {
 		let isOutputFile = $("#is-output-file").is(":checked");
 		let row = $(this).data();
 		// タイトルecho
-		if(row.title && $("#is-echo-title").is(":checked")){
+		if (row.title && $("#is-echo-title").is(":checked")) {
 			command += `echo '${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}'`
 			// ファイル出力
 			if (isOutputFile) {
@@ -66,7 +69,7 @@ function updateConsole() {
 		}
 
 		// コマンドecho
-		if(row.command && $("#is-echo-command").is(":checked")){
+		if (row.command && $("#is-echo-command").is(":checked")) {
 			command += `echo '${row.command}'`
 			// ファイル出力
 			if (isOutputFile) {
@@ -76,17 +79,18 @@ function updateConsole() {
 		}
 
 		// コマンド取得
-		command += $(this).find("[data-type='command']").val();
-
-		// ファイル出力
-		if (isOutputFile) {
-			command += " >> " + output_file;
+		if (row.command) {
+			command += $(this).find("[data-type='command']").val();
+			// ファイル出力
+			if (isOutputFile) {
+				command += " >> " + output_file;
+			}
 		}
 
 		// 最終行の場合に改行 or 次行にタイトルが入力されている場合に改行
-		let nextRow = $(`[data-id='${row.id +1}']`).data();
-		if(!nextRow || nextRow && nextRow.title != ""){
-			if($("#is-after-newline").is(":checked")){
+		let nextRow = $(`[data-id='${row.id + 1}']`).data();
+		if (!nextRow || nextRow && nextRow.title != "") {
+			if ($("#is-after-newline").is(":checked")) {
 				command += `<br>`.repeat($("#after-newline-count").val());
 			}
 		}
@@ -130,7 +134,7 @@ function saveJson() {
 	let jsonItem = tableToDict();
 	console.log(jsonItem);
 	jsonData.items.forEach(function (item, index) {
-		if (item.os == "RHEL8.6") {
+		if (item.profile == selectProfile) {
 			jsonData.items[index] = jsonItem;
 			// return falseでforEachから break;
 			return false;
@@ -140,7 +144,8 @@ function saveJson() {
 
 function tableToDict() {
 	let dict = {};
-	dict["os"] = "RHEL8.6"
+	dict["profile"] = selectProfile;
+	dict["os"] = $("#os-name").val();
 
 	let commands = [];
 	$("#command-table").find(".row").each(function () {
@@ -161,8 +166,29 @@ function readJson() {
 	$.getJSON(jsonFile)
 		.then(function (json) {
 			jsonData = json;
+			// 先にProfileを埋める(1回だけ)
 			for (const item of jsonData.items) {
-				if (item.os == "RHEL8.6") {
+				if($(`#profile-list option[data-profile='${item.profile}']`).length == 0){
+					$("#profile-list").append($(`<option data-profile='${item.profile}'>`).html(item.profile).val(item.profile));
+				}
+
+				// Getparamで選択されていない場合
+				if(!new URL(location.href).searchParams.get("profile")){
+					let profile = $("#profile-list option:selected").val();
+					history.replaceState("","",`?profile=${profile}`);
+				}
+			}
+		
+			for (const item of jsonData.items) {
+				let profile = new URL(location.href).searchParams.get("profile");
+
+				if (item.profile == profile) {
+					selectProfile = item.profile;
+
+					// getパラメータを更新
+					history.replaceState("","",`?profile=${item.profile}`);
+
+					$("#os-name").val(item.os);
 					var index = 1;
 					for (const command of item.commands) {
 						var tr =
@@ -181,6 +207,14 @@ function readJson() {
 			initialize();
 		});
 	return;
+}
+
+function changeProfile(){
+	let newProfile = $("#profile-list option:selected").val()
+	history.replaceState("","",`?profile=${newProfile}`);
+	// テーブルをクリア
+	$(".row").remove();
+	readJson();
 }
 
 
