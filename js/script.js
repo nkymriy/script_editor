@@ -50,10 +50,26 @@ function updateConsole() {
 		if (!$(this).find("[data-type='enabled']").is(":checked")) {
 			return true;
 		}
-		command = $(this).find("[data-type='command']").val();
-		if ($("#is-output-file").is(":checked")) {
-			command += " >> " + $("#output-file-name").val();
 
+		let command = "";
+		let isOutputFile = $("#is-output-file").is(":checked");
+		
+		// タイトル出力
+		if($("#is-echo-title").is(":checked")){
+			command += `echo '${$("#echo-title-before").val()}${$(this).find("[data-type='title']").val()}${$("#echo-title-after").val()}' <br>`
+		}
+
+		// コマンド取得
+		command += $(this).find("[data-type='command']").val();
+
+		// ファイル出力
+		if (isOutputFile) {
+			command += " >> " + $("#output-file-name").val();
+		}
+
+		// コマンド後の改行
+		if($("#is-after-newline").is(":checked")){
+			command += `<br>`.repeat($("#after-newline-count").val());
 		}
 		$console.html($console.html() + command + "<br>");
 	})
@@ -111,10 +127,10 @@ function tableToDict() {
 	$("#command-table").find(".row").each(function () {
 		let rowData = $(this).data();
 		let data = {
-			"id":rowData.id,
-			"enabled":rowData.enabled,
-			"title":rowData.title,
-			"command":rowData.command
+			"id": rowData.id,
+			"enabled": rowData.enabled,
+			"title": rowData.title,
+			"command": rowData.command
 		}
 		commands.push(data);
 	});
@@ -124,32 +140,32 @@ function tableToDict() {
 
 function readJson() {
 	$.getJSON(jsonFile)
-	.then(function(json){
-		jsonData = json;
-		for (const item of jsonData.items) {
-			if (item.os == "RHEL8.6") {
-				var index = 1;
-				for (const command of item.commands) {
-					var tr =
-						`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="row">
-					<th data-type="id">${command.id}</th>
-					<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
-					<td><input type="textbox" data-type="title" value="${command.title}"></td>
-					<td><input type="textbox" data-type="command" value="${command.command}"></td>
-					<td><input type="button" data-command="delete" value="X"></td>
-				`
-					$(tr).appendTo($(".sortable-list"));
-					index += 1;
+		.then(function (json) {
+			jsonData = json;
+			for (const item of jsonData.items) {
+				if (item.os == "RHEL8.6") {
+					var index = 1;
+					for (const command of item.commands) {
+						var tr =
+							`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="row">
+							<th data-type="id">${command.id}</th>
+							<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
+							<td><input type="textbox" data-type="title" value="${command.title}"></td>
+							<td><input type="textbox" data-type="command" value="${command.command}"></td>
+							<td><input type="button" data-command="delete" value="X"></td>
+						`
+						$(tr).appendTo($(".sortable-list"));
+						index += 1;
+					}
 				}
 			}
-		}
-		initialize();
-	});
+			initialize();
+		});
 	return;
 }
 
 
-function downloadJsonFile(){
+function downloadJsonFile() {
 	const blob = new Blob([JSON.stringify(jsonData)]);
 
 	const link = document.createElement('a');
@@ -159,9 +175,9 @@ function downloadJsonFile(){
 }
 
 
-async function updateJsonFile(){
+async function updateJsonFile() {
 
-	[fileHandle] = await window.showOpenFilePicker({types:[{accept:{"text/json":[".json"]}}]});
+	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
 	const file = await fileHandle.getFile();
 	// const fileContents = await file.text();
 	const writable = await fileHandle.createWritable();
@@ -171,7 +187,7 @@ async function updateJsonFile(){
 	await writable.close();
 }
 
-function deleteRow(object){
+function deleteRow(object) {
 	object.parent().parent().remove();
 }
 

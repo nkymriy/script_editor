@@ -14,8 +14,12 @@
 <body>
 	<div class="wrapper">
 		<div class="column left-column">
+			タイトルをechoする→<input type="checkbox" id="is-echo-title" checked><br>
+			・タイトルに接頭辞を付ける→<input type="input" id="echo-title-before" value="=== "><br>
+			・タイトルに接尾辞を付ける→<input type="input" id="echo-title-after" value=" ==="><br>
+			コマンド後に改行する→<input type="checkbox" id="is-after-newline" checked>行数<input type="number" id="after-newline-count" value="1"><br>
 			ファイルに出力する→<input type="checkbox" id="is-output-file" checked><br>
-			ファイル名:<input type="text" id="output-file-name" value="sample.log"><br>
+			・出力ファイル名:<input type="text" id="output-file-name" value="sample.log"><br>
 			<div id="table-wrapper">
 				<table id="command-table">
 					<thead>
