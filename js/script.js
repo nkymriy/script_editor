@@ -56,7 +56,12 @@ function updateConsole() {
 		
 		// タイトル出力
 		if($("#is-echo-title").is(":checked")){
-			command += `echo '${$("#echo-title-before").val()}${$(this).find("[data-type='title']").val()}${$("#echo-title-after").val()}' <br>`
+			command += `echo '${$("#echo-title-before").val()}${$(this).find("[data-type='title']").val()}${$("#echo-title-after").val()}'`
+			// ファイル出力
+			if (isOutputFile) {
+				command += " >> " + $("#output-file-name").val();
+			}
+			command += `<br>`
 		}
 
 		// コマンド取得
