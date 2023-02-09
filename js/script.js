@@ -135,17 +135,20 @@ function addRow() {
 
 function saveJson() {
 	let jsonItem = tableToDict();
+	let isNewProfile = true;
 	console.log(jsonItem);
 	jsonData.items.forEach(function (item, index) {
 		if (item.profileId == $("#profile-id").val()) {
 			jsonData.items[index] = jsonItem;
+			isNewProfile = false;
 			// return falseでforEachから break;
 			return false;
 		}
 	})
 	
-	// 新規Profileの場合
-	jsonData.items.push(jsonItem);
+	if(isNewProfile){
+		jsonData.items.push(jsonItem);
+	}
 }
 
 function tableToDict() {
@@ -173,23 +176,26 @@ function readJson() {
 	$.getJSON(jsonFile)
 		.then(function (json) {
 			jsonData = json;
+			let profiles = []
 			// 先にProfileを埋める(1回だけ)
 			for (const item of jsonData.items) {
+				profiles.push(item.profileId);
 				if($(`#profile-list option[data-profile='${item.profileId}']`).length == 0){
 					$("#profile-list").append($(`<option data-profile='${item.profileId}'>`).html(`${item.profileId}:${item.profileName}`).val(item.profileId));
 				}
 
-				// Getparamで選択されていない場合
-				if(!new URL(location.href).searchParams.get("profile")){
-					let profile = $("#profile-list option:selected").val();
-					history.replaceState("","",`?profile=${profile}`);
-				}
-			}
-		
-			for (const item of jsonData.items) {
-				let profile = new URL(location.href).searchParams.get("profile");
 
-				if (item.profileId == profile) {
+			}
+			
+			let paramProfile = new URL(location.href).searchParams.get("profile");
+			// Getparamで選択されていないか存在しない場合
+			if(!paramProfile || !profiles.includes(paramProfile)){
+				history.replaceState("","",`?profile=${profiles[0]}`);
+				paramProfile = profiles[0];
+			}
+
+			for (const item of jsonData.items) {
+				if (item.profileId == paramProfile) {
 					selectProfile = item.profileId;
 					// getパラメータを更新
 					history.replaceState("","",`?profile=${item.profileId}`);
