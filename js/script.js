@@ -32,6 +32,9 @@ function initialize() {
 	$("#update-button").off("click");
 	$("#update-button").on("click", function () { saveJson(); updateJsonFile(); });
 
+	$("#delete-profile-button").off("click");
+	$("#delete-profile-button").on("click", function () { deleteProfile(); });
+
 	$("input[data-command='delete']").off("click");
 	$("input[data-command='delete']").on("click", function () { deleteRow($(this)); });
 
@@ -134,17 +137,21 @@ function saveJson() {
 	let jsonItem = tableToDict();
 	console.log(jsonItem);
 	jsonData.items.forEach(function (item, index) {
-		if (item.profile == selectProfile) {
+		if (item.profileId == $("#profile-id").val()) {
 			jsonData.items[index] = jsonItem;
 			// return falseでforEachから break;
 			return false;
 		}
 	})
+	
+	// 新規Profileの場合
+	jsonData.items.push(jsonItem);
 }
 
 function tableToDict() {
 	let dict = {};
-	dict["profile"] = selectProfile;
+	dict["profileId"] = $("#profile-id").val();
+	dict["profileName"] = $("#profile-name").val();
 	dict["os"] = $("#os-name").val();
 
 	let commands = [];
@@ -168,8 +175,8 @@ function readJson() {
 			jsonData = json;
 			// 先にProfileを埋める(1回だけ)
 			for (const item of jsonData.items) {
-				if($(`#profile-list option[data-profile='${item.profile}']`).length == 0){
-					$("#profile-list").append($(`<option data-profile='${item.profile}'>`).html(item.profile).val(item.profile));
+				if($(`#profile-list option[data-profile='${item.profileId}']`).length == 0){
+					$("#profile-list").append($(`<option data-profile='${item.profileId}'>`).html(`${item.profileId}:${item.profileName}`).val(item.profileId));
 				}
 
 				// Getparamで選択されていない場合
@@ -182,12 +189,13 @@ function readJson() {
 			for (const item of jsonData.items) {
 				let profile = new URL(location.href).searchParams.get("profile");
 
-				if (item.profile == profile) {
-					selectProfile = item.profile;
-
+				if (item.profileId == profile) {
+					selectProfile = item.profileId;
 					// getパラメータを更新
-					history.replaceState("","",`?profile=${item.profile}`);
+					history.replaceState("","",`?profile=${item.profileId}`);
 
+					$("#profile-id").val(item.profileId);
+					$("#profile-name").val(item.profileName);
 					$("#os-name").val(item.os);
 					var index = 1;
 					for (const command of item.commands) {
@@ -229,19 +237,29 @@ function downloadJsonFile() {
 
 
 async function updateJsonFile() {
-
 	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
 	const file = await fileHandle.getFile();
-	// const fileContents = await file.text();
 	const writable = await fileHandle.createWritable();
-	// jsonData = "test"
 	await writable.write(JSON.stringify(jsonData));
-	// await writable.write(jsonData);
 	await writable.close();
 }
 
 function deleteRow(object) {
 	object.parent().parent().remove();
+}
+
+function deleteProfile(){
+	if(confirm("プロファイルを本当に削除してOK？") == false) return;
+	
+	// 指定されているIDの部分を削除
+	jsonData.items.forEach(function (item, index) {
+		if (item.profileId == $("#profile-id").val()) {
+			jsonData.items.splice(index, 1);
+		}
+	})
+
+	// 上書き保存させる
+	updateJsonFile();
 }
 
 function toast(msg) {
