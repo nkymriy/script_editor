@@ -18,9 +18,9 @@
 			ProfileId:<input id="profile-id"><br>
 			Profile名:<input id="profile-name"><br>
 			OS:<input type="text" id="os-name"><br>
-			タイトルをechoする→<input type="checkbox" id="is-echo-title" checked><br>
-			・タイトルに接頭辞を付ける→<input type="input" id="echo-title-before" value="=== "><br>
-			・タイトルに接尾辞を付ける→<input type="input" id="echo-title-after" value=" ==="><br>
+			タイトルを出力する→<input type="checkbox" id="is-output-title" checked><br>
+			・タイトルに接頭辞を付ける→<input type="input" id="echo-title-before" value="### "><br>
+			・タイトルに接尾辞を付ける→<input type="input" id="echo-title-after" value=" ###"><br>
 			コマンドをechoする→<input type="checkbox" id="is-echo-command" checked><br>
 			コマンド後に改行する→<input type="checkbox" id="is-after-newline" checked>行数<input type="number" id="after-newline-count" value="1"><br>
 			ファイルに出力する→<input type="checkbox" id="is-output-file" checked><br>
@@ -42,6 +42,7 @@
 			</div>
 			<input type="button" value="行追加" id="add-row-button">
 			<input type="button" value="保存" id="save-button">
+			<input type="button" value="読込" id="read-button">
 			<input type="button" value="ファイル更新" id="update-button">
 		</div>
 		<div class="column right-column">
