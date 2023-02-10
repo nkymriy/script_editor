@@ -65,8 +65,8 @@ function updateConsole() {
 		let isOutputFile = $("#is-output-file").is(":checked");
 		let row = $(this).data();
 		// タイトルecho
-		if (row.title && $("#is-echo-title").is(":checked")) {
-			command += `echo '${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}'`
+		if (row.title && $("#is-output-title").is(":checked")) {
+			command += `${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}`
 			// ファイル出力
 			if (isOutputFile) {
 				command += " >> " + output_file;
@@ -177,8 +177,8 @@ function tableToDict() {
 
 async function readJsonFile(){
 	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
-	const jsonFile = await fileHandle.getFile();
-	jsonData = JSON.parse(await jsonFile.text());
+	const rowJsonFile = await fileHandle.getFile();
+	jsonData = JSON.parse(await rowJsonFile.text());
 	readJson();
 }
 
