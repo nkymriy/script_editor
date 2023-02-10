@@ -3,7 +3,7 @@ let jsonData = {};
 let selectProfile;
 
 $(window).on("load", function () {
-	readJson();
+	// readJson();
 	$(".sortable-list").sortable({
 		axis: "y",
 		containment: $("#table-wrapper"),
@@ -28,6 +28,9 @@ function initialize() {
 
 	$("#save-button").off("click");
 	$("#save-button").on("click", function () { saveJson(); downloadJsonFile(); });
+
+	$("#read-button").off("click");
+	$("#read-button").on("click", function () { readJsonFile(); });
 
 	$("#update-button").off("click");
 	$("#update-button").on("click", function () { saveJson(); updateJsonFile(); });
@@ -172,54 +175,57 @@ function tableToDict() {
 	return dict;
 }
 
+async function readJsonFile(){
+	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
+	const jsonFile = await fileHandle.getFile();
+	jsonData = JSON.parse(await jsonFile.text());
+	readJson();
+}
+
 function readJson() {
-	$.getJSON(jsonFile)
-		.then(function (json) {
-			jsonData = json;
-			let profiles = []
-			// 先にProfileを埋める(1回だけ)
-			for (const item of jsonData.items) {
-				profiles.push(item.profileId);
-				if($(`#profile-list option[data-profile='${item.profileId}']`).length == 0){
-					$("#profile-list").append($(`<option data-profile='${item.profileId}'>`).html(`${item.profileId}:${item.profileName}`).val(item.profileId));
-				}
+	let profiles = []
+	// 先にProfileを埋める(1回だけ)
+	for (const item of jsonData.items) {
+		profiles.push(item.profileId);
+		if($(`#profile-list option[data-profile='${item.profileId}']`).length == 0){
+			$("#profile-list").append($(`<option data-profile='${item.profileId}'>`).html(`${item.profileId}:${item.profileName}`).val(item.profileId));
+		}
 
 
+	}
+	
+	let paramProfile = new URL(location.href).searchParams.get("profile");
+	// Getparamで選択されていないか存在しない場合
+	if(!paramProfile || !profiles.includes(paramProfile)){
+		history.replaceState("","",`?profile=${profiles[0]}`);
+		paramProfile = profiles[0];
+	}
+
+	for (const item of jsonData.items) {
+		if (item.profileId == paramProfile) {
+			selectProfile = item.profileId;
+			// getパラメータを更新
+			history.replaceState("","",`?profile=${item.profileId}`);
+
+			$("#profile-id").val(item.profileId);
+			$("#profile-name").val(item.profileName);
+			$("#os-name").val(item.os);
+			var index = 1;
+			for (const command of item.commands) {
+				var tr =
+					`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="row">
+					<th data-type="id">${command.id}</th>
+					<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
+					<td><input type="textbox" data-type="title" value="${command.title}"></td>
+					<td><input type="textbox" data-type="command" value="${command.command}"></td>
+					<td><input type="button" data-command="delete" value="X"></td>
+				`
+				$(tr).appendTo($(".sortable-list"));
+				index += 1;
 			}
-			
-			let paramProfile = new URL(location.href).searchParams.get("profile");
-			// Getparamで選択されていないか存在しない場合
-			if(!paramProfile || !profiles.includes(paramProfile)){
-				history.replaceState("","",`?profile=${profiles[0]}`);
-				paramProfile = profiles[0];
-			}
-
-			for (const item of jsonData.items) {
-				if (item.profileId == paramProfile) {
-					selectProfile = item.profileId;
-					// getパラメータを更新
-					history.replaceState("","",`?profile=${item.profileId}`);
-
-					$("#profile-id").val(item.profileId);
-					$("#profile-name").val(item.profileName);
-					$("#os-name").val(item.os);
-					var index = 1;
-					for (const command of item.commands) {
-						var tr =
-							`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="row">
-							<th data-type="id">${command.id}</th>
-							<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
-							<td><input type="textbox" data-type="title" value="${command.title}"></td>
-							<td><input type="textbox" data-type="command" value="${command.command}"></td>
-							<td><input type="button" data-command="delete" value="X"></td>
-						`
-						$(tr).appendTo($(".sortable-list"));
-						index += 1;
-					}
-				}
-			}
-			initialize();
-		});
+		}
+	}
+	initialize();
 	return;
 }
 
