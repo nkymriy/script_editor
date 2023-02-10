@@ -1,9 +1,7 @@
-const jsonFile = 'data.json';
 let jsonData = {};
 let selectProfile;
 
 $(window).on("load", function () {
-	// readJson();
 	$(".sortable-list").sortable({
 		axis: "y",
 		containment: $("#table-wrapper"),
@@ -190,8 +188,6 @@ function readJson() {
 		if($(`#profile-list option[data-profile='${item.profileId}']`).length == 0){
 			$("#profile-list").append($(`<option data-profile='${item.profileId}'>`).html(`${item.profileId}:${item.profileName}`).val(item.profileId));
 		}
-
-
 	}
 	
 	let paramProfile = new URL(location.href).searchParams.get("profile");
@@ -249,11 +245,12 @@ function downloadJsonFile() {
 
 
 async function updateJsonFile() {
-	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
-	const file = await fileHandle.getFile();
+	// [fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
+	// const file = await fileHandle.getFile();
 	const writable = await fileHandle.createWritable();
 	await writable.write(JSON.stringify(jsonData));
 	await writable.close();
+	toast("保存しました！");
 }
 
 function deleteRow(object) {
