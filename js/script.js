@@ -2,6 +2,9 @@ let jsonData = {};
 let selectProfile;
 
 $(window).on("load", function () {
+	let clipboard = new ClipboardJS('.clip');
+
+
 	$(".extend-option-list").sortable({
 		axis: "y",
 		containment: $(".extend-option-table-wrapper"),
@@ -54,6 +57,7 @@ function initialize() {
 
 	$("#profile-list").off("change");
 	$("#profile-list").on("change", function () { changeProfile() });
+
 	update()
 }
 
@@ -63,6 +67,7 @@ function initialize() {
 function update() {
 	updateTable();
 	updateConsole();
+	updateConsoleHeader();
 }
 
 /**
@@ -163,6 +168,14 @@ function updateTable() {
 		$(this).data("command", $command.val());
 		index += 1;
 	});
+}
+
+/**
+ * コンソールヘッダ更新
+ */
+function updateConsoleHeader(){
+	console.log(charCount($(".console-space").text()))
+	$("#charCount").text(charCount($(".console-space").text()));
 }
 
 /**
@@ -505,3 +518,11 @@ function updateCodeLine(spanTag) {
 	textSpans.forEach(span => spanTag.append(span));
 }
 
+/**
+ * 文字数カウント
+ * @param {*} str 
+ * @returns 文字数
+ */
+function charCount(str){
+	return str.length;
+}

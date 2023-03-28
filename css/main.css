@@ -19,8 +19,18 @@ body {
 }
 
 .right-column {
-	background-color: black;
 	color: white;
+}
+
+.console-header {
+	background-color: #666;
+	height: 1.6rem;
+}
+
+.console-space {
+	margin:0;
+	background-color: black;
+	height: calc(100% - 1.6rem);
 }
 
 .table-wrapper>table {
@@ -34,6 +44,12 @@ table {
 td,
 th {
 	border: 1px black solid;
+}
+
+.copy-button {
+	position: flow;
+	top: 0%;
+	right: 0%;
 }
 
 /* 行番号表示{ */

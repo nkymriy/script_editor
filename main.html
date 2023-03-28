@@ -5,6 +5,7 @@
 	<script src="js/import/jquery-3.6.3.min.js"></script>
 	<script src="js/import/jquery-ui-1.13.2/jquery-ui.js"></script>
 	<script src="js/import/jquery-toast-plugin/jquery.toast.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
 	<script src="js/script.js"></script>
 	<link rel="stylesheet" href="css/main.css">
 	<link rel="stylesheet" href="js/import/jquery-ui-1.13.2/jquery-ui.css">
@@ -72,7 +73,11 @@
 			<input type="button" value="ファイル更新" id="update-button">
 		</div>
 		<div class="column right-column">
-			<pre><code class="console-space code"></code></pre>
+			<div class="console-header">
+				<button id="copyButton" class="clip" data-clipboard-target=".console-space">コピー</button>
+				文字数: <span id="charCount"></span>
+			</div>
+			<pre class="console-space code"><code></code></pre>
 		</div>
 	</div>
 </body>
