@@ -24,7 +24,7 @@ body {
 	color: white;
 }
 
-#command-table {
+.table-wrapper {
 	padding: 2rem;
 }
 
@@ -53,4 +53,5 @@ th {
 	content: counter(line-number);
 	color: #aaa;
 }
+
 /* }行番号表示 */

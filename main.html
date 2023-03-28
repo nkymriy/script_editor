@@ -18,14 +18,33 @@
 			ProfileId:<input id="profile-id"><br>
 			Profile名:<input id="profile-name"><br>
 			OS:<input type="text" id="os-name"><br>
-			タイトルを出力する→<input type="checkbox" id="is-output-title" checked><br>
+			<br>
+			拡張設定
+			<div class="table-wrapper">
+				<table id="extend-option-table">
+					<thead>
+						<tr>
+							<th>No.</th>
+							<td>有効化</td>
+							<td>名前</td>
+							<td>内容</td>
+							<td>タイトル</td>
+							<td>コマンド</td>
+							<td>削除</td>
+						</tr>
+					</thead>
+					<tbody class="sortable-list">
+					</tbody>
+				</table>
+			</div>
+			<!-- タイトルを出力する→<input type="checkbox" id="is-output-title" checked><br>
 			・タイトルに接頭辞を付ける→<input type="input" id="echo-title-before" value="### "><br>
 			・タイトルに接尾辞を付ける→<input type="input" id="echo-title-after" value=" ###"><br>
 			コマンドをechoする→<input type="checkbox" id="is-echo-command" checked><br>
 			コマンド後に改行する→<input type="checkbox" id="is-after-newline" checked>行数<input type="number" id="after-newline-count" value="1"><br>
 			ファイルに出力する→<input type="checkbox" id="is-output-file" checked><br>
-			・出力ファイル名:<input type="text" id="output-file-name" value="sample.log"><br>
-			<div id="table-wrapper">
+			・出力ファイル名:<input type="text" id="output-file-name" value="sample.log"><br> -->
+			<div class="table-wrapper">
 				<table id="command-table">
 					<thead>
 						<tr>
@@ -36,7 +55,7 @@
 							<td>削除</td>
 						</tr>
 					</thead>
-					<tbody class="sortable-list">
+					<tbody class="sortable-list command-list">
 					</tbody>
 				</table>
 			</div>
