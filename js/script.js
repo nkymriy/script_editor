@@ -73,9 +73,9 @@ function updateConsole() {
 	$console.text("");
 	let outputFile = $("#output-file-name").val();
 	let extendOptions = [];
-	
+
 	// 拡張設定をリストに読み込む
-	$(".extend-option-list").children().each(function(){
+	$(".extend-option-list").children().each(function () {
 		let optionData = $(this).data();
 		if (!optionData.enabled) {
 			return true;
@@ -91,18 +91,18 @@ function updateConsole() {
 		}
 
 		let command = "";
-		for(let extendOption of extendOptions){
-			if(row.ignoreExtendOption){
+		for (let extendOption of extendOptions) {
+			if (row.ignoreExtendOption) {
 				command += `${row.command}`.wrapHtmlTag("span");
 				break;
 			}
 			// タイトル
-			if(extendOption.enableTitle && row.title){
-				command +=  `${extendOption.description.replace("${target}", row.title)}`.wrapHtmlTag("span");
+			if (extendOption.enabledTitle && row.title) {
+				command += `${extendOption.description.replace("${target}", row.title)}`.wrapHtmlTag("span");
 			}
 			// コマンド
-			if(extendOption.enableCommand && row.command){
-				command +=  `${extendOption.description.replace("${target}", row.command)}`.wrapHtmlTag("span");
+			if (extendOption.enabledCommand && row.command) {
+				command += `${extendOption.description.replace("${target}", row.command)}`.wrapHtmlTag("span");
 			}
 		};
 
@@ -128,8 +128,8 @@ function updateTable() {
 		let $enabled = $(this).find("[data-type='enabled']");
 		let $name = $(this).find("[data-type='name']");
 		let $description = $(this).find("[data-type='description']");
-		let $enableTitle = $(this).find("[data-type='enabledTitle']");
-		let $enableCommand = $(this).find("[data-type='enabledCommand']");
+		let $enabledTitle = $(this).find("[data-type='enabledTitle']");
+		let $enabledCommand = $(this).find("[data-type='enabledCommand']");
 
 		$(this).data("id", index);
 		$(this).attr("data-id", index);
@@ -137,8 +137,8 @@ function updateTable() {
 		$(this).data("enabled", $enabled.is(":checked"));
 		$(this).data("name", $name.val());
 		$(this).data("description", $description.val());
-		$(this).data("enableTitle", $enableTitle.is(":checked"));
-		$(this).data("enableCommand", $enableCommand.is(":checked"));
+		$(this).data("enabledTitle", $enabledTitle.is(":checked"));
+		$(this).data("enabledCommand", $enabledCommand.is(":checked"));
 		index += 1;
 	});
 
@@ -160,7 +160,6 @@ function updateTable() {
 		$(this).data("command", $command.val());
 		index += 1;
 	});
-	console.log($(".command-row[data-id='1']").data())
 }
 
 /**
@@ -168,7 +167,7 @@ function updateTable() {
  */
 function addExtendOptionRow() {
 	let id = $(".extend-option-row").length + 1
-	var tr =
+	let tr =
 		`<tr data-id="${id}" data-enabled="true" class="extend-option-row">
 			<th data-type="id">${id}</th>
 			<td><input type="checkbox" data-type="enabled" checked></td>
@@ -187,7 +186,7 @@ function addExtendOptionRow() {
  */
 function addCommandRow() {
 	let id = $(".command-row").length + 1
-	var tr =
+	let tr =
 		`<tr data-id="${id}" data-enabled="true" class="command-row">
 			<th data-type="id">${id}</th>
 			<td><input type="checkbox" data-type="enabled" checked></td>
@@ -229,6 +228,23 @@ function tableToDict() {
 	dict["profileId"] = $("#profile-id").val();
 	dict["profileName"] = $("#profile-name").val();
 	dict["os"] = $("#os-name").val();
+	dict["options"] = {};
+	dict["options"]["afterNewlineCount"] = $("#after-newline-count").val();
+	
+	let extendOptions = [];
+	$("#extend-option-table").find(".extend-option-row").each(function () {
+		let rowData = $(this).data();
+		let data = {
+			"id": rowData.id,
+			"enabled": rowData.enabled,
+			"name": rowData.name,
+			"description": rowData.description,
+			"enabledTitle": rowData.enabledTitle,
+			"enabledCommand": rowData.enabledCommand,
+		}
+		extendOptions.push(data);
+	});
+	dict["extendOptions"] = extendOptions;
 
 	let commands = [];
 	$("#command-table").find(".command-row").each(function () {
@@ -252,6 +268,8 @@ async function readJsonFile() {
 	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
 	const rowJsonFile = await fileHandle.getFile();
 	jsonData = JSON.parse(await rowJsonFile.text());
+	$(".extend-option-row").remove();
+	$(".command-row").remove();
 	readJson();
 }
 
@@ -276,27 +294,48 @@ function readJson() {
 	}
 
 	// コマンド詰め込み
-	for (const item of jsonData.items) {
+	for (let item of jsonData.items) {
 		if (item.profileId == paramProfile) {
 			selectProfile = item.profileId;
 			// getパラメータを更新
 			history.replaceState("", "", `?profile=${item.profileId}`);
-
 			$("#profile-id").val(item.profileId);
 			$("#profile-name").val(item.profileName);
 			$("#os-name").val(item.os);
-			var index = 1;
+			$("#after-newline-count").val(item.options?.afterNewlineCount);
+			let index = 1;
+			// 拡張設定
+			for (let extendOption of item.extendOptions) {
+				let tr =
+					`<tr class="extend-option-row" data-id="${extendOption.id}" data-enabled=${extendOption.enabled} data-name=${extendOption.name} data-description=${extendOption.description} data-enabledTitle=${extendOption.enabledTitle} data-enabledCommand=${extendOption.enabledCommand}>
+				<th data-type="id">${extendOption.id}</th>
+				<td><input type="checkbox" data-type="enabled" ${extendOption.enabled ? "checked" : ""}></td>
+				<td><input type="textbox" data-type="name"></td>
+				<td><input type="textbox" data-type="description"></td>
+				<td><input type="checkbox" data-type="enabledTitle" ${extendOption.enabledTitle ? "checked" : ""}></td>
+				<td><input type="checkbox" data-type="enabledCommand" ${extendOption.enabledCommand ? "checked" : ""}></td>
+				<td><input type="button" data-command="delete" value="X"></td>
+			`
+				$(tr).appendTo($(".extend-option-list"));
+				$(`.extend-option-row[data-id=${extendOption.id}]`).find("[data-type=name]").val(extendOption.name);
+				$(`.extend-option-row[data-id=${extendOption.id}]`).find("[data-type=description]").val(extendOption.description);
+				index += 1;
+			}
+
+			// コマンド
 			for (const command of item.commands) {
-				var tr =
-					`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="command-row">
+				let tr =
+					`<tr class="command-row" data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}">
 					<th data-type="id">${command.id}</th>
 					<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
 					<td><input type="checkbox" data-type="ignoreExtendOption" ${command.ignoreExtendOption ? "checked" : ""}></td>
-					<td><input type="textbox" data-type="title" value="${command.title}"></td>
-					<td><input type="textbox" data-type="command" value="${command.command}"></td>
+					<td><input type="textbox" data-type="title"></td>
+					<td><input type="textbox" data-type="command"></td>
 					<td><input type="button" data-command="delete" value="X"></td>
 				`
 				$(tr).appendTo($(".command-list"));
+				$(`.command-row[data-id=${command.id}]`).find("[data-type=title]").val(command.title);
+				$(`.command-row[data-id=${command.id}]`).find("[data-type=command]").val(command.command);
 				index += 1;
 			}
 		}

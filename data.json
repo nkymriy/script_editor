@@ -1,1 +1,75 @@
-{"items":[{"profileId":"1","profileName":"サンプル","os":"EXAMPLE","commands":[{"id":1,"enabled":true,"title":"日付","command":"date"},{"id":2,"enabled":true,"title":"OS情報","command":"cat /etc/system-release"},{"id":3,"enabled":true,"title":"日付","command":"date"},{"id":4,"enabled":true,"title":"OS情報","command":"cat /etc/system-release"}]},{"profileId":"2","profileName":"サンプル2","os":"EXAMPLE","commands":[{"id":1,"enabled":true,"title":"日付","command":"date"},{"id":2,"enabled":true,"title":"ログ表示","command":"cat /var/log/messages"}]}]}
+{
+	"items": [
+		{
+			"profileId": "1",
+			"profileName": "サンプル",
+			"os": "EXAMPLE",
+			"options": {
+				"afterNewLine": 2
+			},
+			"extendOptions": [
+				{
+					"id": 1,
+					"enabled": true,
+					"name": "タイトル・コマンド出力",
+					"description": "echo ${target} >> \"sample.log\" + 'sample.log'",
+					"enabledTitle": true,
+					"enabledCommand": true
+				},
+				{
+					"id": 2,
+					"enabled": true,
+					"name": "コマンド実行",
+					"description": "${target} | tee -a sample.log",
+					"enabledTitle": false,
+					"enabledCommand": true
+				}
+			],
+			"commands": [
+				{
+					"id": 1,
+					"enabled": true,
+					"title": "日付",
+					"command": "date"
+				},
+				{
+					"id": 2,
+					"enabled": true,
+					"title": "OS情報",
+					"command": "cat /etc/system-release"
+				},
+				{
+					"id": 3,
+					"enabled": true,
+					"title": "日付",
+					"command": "date"
+				},
+				{
+					"id": 4,
+					"enabled": true,
+					"title": "OS情報",
+					"command": "cat /etc/system-release"
+				}
+			]
+		},
+		{
+			"profileId": "2",
+			"profileName": "サンプル2",
+			"os": "EXAMPLE",
+			"commands": [
+				{
+					"id": 1,
+					"enabled": true,
+					"title": "日付",
+					"command": "date"
+				},
+				{
+					"id": 2,
+					"enabled": true,
+					"title": "ログ表示",
+					"command": "cat /var/log/messages"
+				}
+			]
+		}
+	]
+}
