@@ -18,9 +18,10 @@
 			ProfileId:<input id="profile-id"><br>
 			Profile名:<input id="profile-name"><br>
 			OS:<input type="text" id="os-name"><br>
+			コマンド後改行:行数<input type="number" id="after-newline-count" value="1"><br>
 			<br>
 			拡張設定
-			<div class="table-wrapper">
+			<div class="table-wrapper extend-option-table-wrapper">
 				<table id="extend-option-table">
 					<thead>
 						<tr>
@@ -28,30 +29,34 @@
 							<td>有効化</td>
 							<td>名前</td>
 							<td>内容</td>
-							<td>タイトル</td>
-							<td>コマンド</td>
+							<td>タイトル有効</td>
+							<td>コマンド有効</td>
 							<td>削除</td>
 						</tr>
 					</thead>
-					<tbody class="sortable-list">
+					<tbody class="sortable-list extend-option-list">
+						<tr data-id="1" data-enabled="true" class="extend-option-row">
+							<th data-type="id">1</th>
+							<td><input type="checkbox" data-type="enabled" checked></td>
+							<td><input type="textbox" data-type="name" value="コマンド出力"></td>
+							<td><input type="textbox" data-type="description" value="${target}"></td>
+							<td><input type="checkbox" data-type="enabledTitle"></td>
+							<td><input type="checkbox" data-type="enabledCommand" checked></td>
+							<td><input type="button" data-command="delete" value="X"></td>
 					</tbody>
 				</table>
 			</div>
-			<!-- タイトルを出力する→<input type="checkbox" id="is-output-title" checked><br>
-			・タイトルに接頭辞を付ける→<input type="input" id="echo-title-before" value="### "><br>
-			・タイトルに接尾辞を付ける→<input type="input" id="echo-title-after" value=" ###"><br>
-			コマンドをechoする→<input type="checkbox" id="is-echo-command" checked><br>
-			コマンド後に改行する→<input type="checkbox" id="is-after-newline" checked>行数<input type="number" id="after-newline-count" value="1"><br>
-			ファイルに出力する→<input type="checkbox" id="is-output-file" checked><br>
-			・出力ファイル名:<input type="text" id="output-file-name" value="sample.log"><br> -->
-			<div class="table-wrapper">
+			<input type="button" value="行追加" id="add-extend-option-button">
+			
+			<div class="table-wrapper command-table-wrapper">
 				<table id="command-table">
 					<thead>
 						<tr>
 							<th>No.</th>
 							<td>有効化</td>
+							<td>拡張無視</td>
 							<td>タイトル</td>
-							<td>備考</td>
+							<td>コマンド</td>
 							<td>削除</td>
 						</tr>
 					</thead>
@@ -59,8 +64,8 @@
 					</tbody>
 				</table>
 			</div>
-			<input type="button" value="行追加" id="add-row-button">
-			<input type="button" value="保存" id="save-button">
+			<input type="button" value="行追加" id="add-command-button">
+			<!-- <input type="button" value="保存" id="save-button"> -->
 			<input type="button" value="読込" id="read-button">
 			<input type="button" value="ファイル更新" id="update-button">
 		</div>

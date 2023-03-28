@@ -2,9 +2,16 @@ let jsonData = {};
 let selectProfile;
 
 $(window).on("load", function () {
-	$(".sortable-list").sortable({
+	$(".extend-option-list").sortable({
 		axis: "y",
-		containment: $("#table-wrapper"),
+		containment: $(".extend-option-table-wrapper"),
+		create: function (event, ui) { update(); },
+		deactivate: function (event, ui) { update(); }
+	});
+
+	$(".command-list").sortable({
+		axis: "y",
+		containment: $(".command-table-wrapper"),
 		create: function (event, ui) { update(); },
 		deactivate: function (event, ui) { update(); }
 	});
@@ -24,8 +31,11 @@ function initialize() {
 		if (e.keyCode == 13) update();
 	})
 
-	$("#add-row-button").off("click");
-	$("#add-row-button").on("click", function () { addCommandRow(); });
+	$("#add-extend-option-button").off("click");
+	$("#add-extend-option-button").on("click", function () { addExtendOptionRow(); });
+
+	$("#add-command-button").off("click");
+	$("#add-command-button").on("click", function () { addCommandRow(); });
 
 	$("#save-button").off("click");
 	$("#save-button").on("click", function () { saveJson(); downloadJsonFile(); });
@@ -61,51 +71,45 @@ function update() {
 function updateConsole() {
 	$console = $(".console-space");
 	$console.text("");
-	let output_file = $("#output-file-name").val();
-	$(".sortable-list").children().each(function () {
+	let outputFile = $("#output-file-name").val();
+	let extendOptions = [];
+	
+	// 拡張設定をリストに読み込む
+	$(".extend-option-list").children().each(function(){
+		let optionData = $(this).data();
+		if (!optionData.enabled) {
+			return true;
+		}
+		extendOptions.push(optionData);
+	});
+
+	$(".command-list").children().each(function () {
 		// each内でreturn trueをするとContinue
-		if (!$(this).find("[data-type='enabled']").is(":checked")) {
+		let row = $(this).data();
+		if (!row.enabled) {
 			return true;
 		}
 
 		let command = "";
-		let tmpCommand = "";
-		let isOutputFile = $("#is-output-file").is(":checked");
-		let row = $(this).data();
-		// タイトルecho
-		if (row.title && $("#is-output-title").is(":checked")) {
-			tmpCommand += `${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}`
-			// ファイル出力
-			if (isOutputFile) {
-				tmpCommand += " >> " + output_file;
+		for(let extendOption of extendOptions){
+			if(row.ignoreExtendOption){
+				command += `${row.command}`.wrapHtmlTag("span");
+				break;
 			}
-			command += tmpCommand.wrapHtmlTag("span");
-		}
-
-		// コマンドecho
-		if (row.command && $("#is-echo-command").is(":checked")) {
-			tmpCommand = `echo '${row.command}'`
-			// ファイル出力
-			if (isOutputFile) {
-				tmpCommand += " >> " + output_file;
+			// タイトル
+			if(extendOption.enableTitle && row.title){
+				command +=  `${extendOption.description.replace("${target}", row.title)}`.wrapHtmlTag("span");
 			}
-			command += tmpCommand.wrapHtmlTag("span")
-		}
-
-		// コマンド取得
-		if (row.command) {
-			tmpCommand = $(this).find("[data-type='command']").val();
-			// ファイル出力
-			if (isOutputFile) {
-				tmpCommand += " >> " + output_file;
+			// コマンド
+			if(extendOption.enableCommand && row.command){
+				command +=  `${extendOption.description.replace("${target}", row.command)}`.wrapHtmlTag("span");
 			}
-			command += tmpCommand.wrapHtmlTag("span")
-		}
+		};
 
 		// 最終行の場合に改行 or 次行にタイトルが入力されている場合に改行
-		let nextRow = $(`[data-id='${row.id + 1}']`).data();
+		let nextRow = $(`.command-row[data-id='${row.id + 1}']`).data();
 		if (!nextRow || nextRow && nextRow.title != "") {
-			if ($("#is-after-newline").is(":checked")) {
+			if ($("#after-newline-count").val() > 0) {
 				command += `\n`.wrapHtmlTag("span").repeat($("#after-newline-count").val());
 			}
 		}
@@ -117,31 +121,77 @@ function updateConsole() {
  * テーブル(画面左)更新
  */
 function updateTable() {
+	// 拡張設定行
 	let index = 1
-	$(".row").each(function () {
+	$(".extend-option-row").each(function () {
 		let $id = $(this).find("[data-type='id']");
-		let $checked = $(this).find("[data-type='enabled']");
+		let $enabled = $(this).find("[data-type='enabled']");
+		let $name = $(this).find("[data-type='name']");
+		let $description = $(this).find("[data-type='description']");
+		let $enableTitle = $(this).find("[data-type='enabledTitle']");
+		let $enableCommand = $(this).find("[data-type='enabledCommand']");
+
+		$(this).data("id", index);
+		$(this).attr("data-id", index);
+		$id.text(index);
+		$(this).data("enabled", $enabled.is(":checked"));
+		$(this).data("name", $name.val());
+		$(this).data("description", $description.val());
+		$(this).data("enableTitle", $enableTitle.is(":checked"));
+		$(this).data("enableCommand", $enableCommand.is(":checked"));
+		index += 1;
+	});
+
+	// コマンド行
+	index = 1
+	$(".command-row").each(function () {
+		let $id = $(this).find("[data-type='id']");
+		let $enabled = $(this).find("[data-type='enabled']");
+		let $ignoreExtendOption = $(this).find("[data-type='ignoreExtendOption']");
 		let $title = $(this).find("[data-type='title']");
 		let $command = $(this).find("[data-type='command']");
 
 		$(this).data("id", index);
-		$(this).data("enabled", $checked.is(":checked"));
+		$(this).attr("data-id", index);
+		$id.text(index);
+		$(this).data("enabled", $enabled.is(":checked"));
+		$(this).data("ignoreExtendOption", $ignoreExtendOption.is(":checked"));
 		$(this).data("title", $title.val());
 		$(this).data("command", $command.val());
-		$id.text(index);
 		index += 1;
 	});
+	console.log($(".command-row[data-id='1']").data())
+}
+
+/**
+ * 拡張設定行の追加
+ */
+function addExtendOptionRow() {
+	let id = $(".extend-option-row").length + 1
+	var tr =
+		`<tr data-id="${id}" data-enabled="true" class="extend-option-row">
+			<th data-type="id">${id}</th>
+			<td><input type="checkbox" data-type="enabled" checked></td>
+			<td><input type="textbox" data-type="name"></td>
+			<td><input type="textbox" data-type="description"></td>
+			<td><input type="checkbox" data-type="enabledTitle" checked></td>
+			<td><input type="checkbox" data-type="enabledCommand" checked></td>
+			<td><input type="button" data-command="delete" value="X"></td>
+		`
+	$(tr).appendTo($(".extend-option-list"));
+	initialize();
 }
 
 /**
  * コマンド行の追加
  */
 function addCommandRow() {
-	let id = $(".row").length + 1
+	let id = $(".command-row").length + 1
 	var tr =
-		`<tr data-id="${id}" data-enabled="true" class="row">
+		`<tr data-id="${id}" data-enabled="true" class="command-row">
 			<th data-type="id">${id}</th>
 			<td><input type="checkbox" data-type="enabled" checked></td>
+			<td><input type="checkbox" data-type="ignoreExtendOption"></td>
 			<td><input type="textbox" data-type="title"></td>
 			<td><input type="textbox" data-type="command"></td>
 			<td><input type="button" data-command="delete" value="X"></td>
@@ -156,7 +206,6 @@ function addCommandRow() {
 function saveJson() {
 	let jsonItem = tableToDict();
 	let isNewProfile = true;
-	console.log(jsonItem);
 	jsonData.items.forEach(function (item, index) {
 		if (item.profileId == $("#profile-id").val()) {
 			jsonData.items[index] = jsonItem;
@@ -182,7 +231,7 @@ function tableToDict() {
 	dict["os"] = $("#os-name").val();
 
 	let commands = [];
-	$("#command-table").find(".row").each(function () {
+	$("#command-table").find(".command-row").each(function () {
 		let rowData = $(this).data();
 		let data = {
 			"id": rowData.id,
@@ -239,9 +288,10 @@ function readJson() {
 			var index = 1;
 			for (const command of item.commands) {
 				var tr =
-					`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="row">
+					`<tr data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}" class="command-row">
 					<th data-type="id">${command.id}</th>
 					<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
+					<td><input type="checkbox" data-type="ignoreExtendOption" ${command.ignoreExtendOption ? "checked" : ""}></td>
 					<td><input type="textbox" data-type="title" value="${command.title}"></td>
 					<td><input type="textbox" data-type="command" value="${command.command}"></td>
 					<td><input type="button" data-command="delete" value="X"></td>
@@ -261,7 +311,8 @@ function changeProfile() {
 	let newProfile = $("#profile-list option:selected").val()
 	history.replaceState("", "", `?profile=${newProfile}`);
 	// テーブルをクリア
-	$(".row").remove();
+	$(".extend-option-row").remove();
+	$(".command-row").remove();
 	readJson();
 }
 
