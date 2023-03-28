@@ -3,7 +3,10 @@ let selectProfile;
 
 $(window).on("load", function () {
 	let clipboard = new ClipboardJS('.clip');
-
+	clipboard.on('success', function(e) {
+		toast("コピーしました！")
+	});
+	
 
 	$(".extend-option-list").sortable({
 		axis: "y",
