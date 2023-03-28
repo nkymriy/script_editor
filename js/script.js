@@ -115,6 +115,9 @@ function updateConsole() {
 		}
 		$console.html($console.html() + command);
 	})
+	$(".code > span").each(function () {
+		updateCodeLine($(this));
+	})
 }
 
 /**
@@ -230,7 +233,7 @@ function tableToDict() {
 	dict["os"] = $("#os-name").val();
 	dict["options"] = {};
 	dict["options"]["afterNewlineCount"] = $("#after-newline-count").val();
-	
+
 	let extendOptions = [];
 	$("#extend-option-table").find(".extend-option-row").each(function () {
 		let rowData = $(this).data();
@@ -251,6 +254,7 @@ function tableToDict() {
 		let rowData = $(this).data();
 		let data = {
 			"id": rowData.id,
+			"ignoreExtendOption": rowData.ignoreExtendOption,
 			"enabled": rowData.enabled,
 			"title": rowData.title,
 			"command": rowData.command
@@ -434,3 +438,70 @@ function toast(msg) {
 		position: 'top-right'
 	});
 }
+
+/**
+ * 文字を1文字ずつ分割する関数
+ * @param {string} text 
+ * @returns 
+ */
+function splitText(text) {
+	return Array.from(text).map(char => {
+		const span = document.createElement('span');
+		span.textContent = char;
+		return span;
+	});
+}
+
+/**
+ * 数字だけを含む要素
+ * @param {array} spans 
+ */
+function styleDigitSpans(spans) {
+	spans.forEach(span => {
+		if (/\d/.test(span.textContent)) {
+			span.classList.add('console-digit');
+		}
+	});
+}
+
+/**
+ * 記号だけを含む要素
+ * @param {array} spans 
+ */
+function styleSymbolSpans(spans) {
+	spans.forEach(span => {
+		if (/^[^a-zA-Z0-9]+$/.test(span.textContent)) {
+			span.classList.add('console-symbol');
+		}
+	});
+}
+
+/**
+ * 大文字だけを含む要素
+ * @param {array} spans 
+ */
+function styleUpperSpans(spans) {
+	spans.forEach(span => {
+		if (/^[A-Z]+$/.test(span.textContent)) {
+			span.classList.add('console-upper');
+		}
+	});
+}
+
+/**
+ * コードの行を更新する関数
+ * @param {jqueryObject} spanTag 
+ */
+function updateCodeLine(spanTag) {
+	// 既存の文字を分割した要素を削除する
+	code = spanTag.text();
+	spanTag.text("");
+
+	// 新しい文字を分割した要素を作成し、行に追加する
+	let textSpans = splitText(code);
+	styleDigitSpans(textSpans);
+	styleSymbolSpans(textSpans);
+	styleUpperSpans(textSpans);
+	textSpans.forEach(span => spanTag.append(span));
+}
+

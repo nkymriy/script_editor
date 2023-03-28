@@ -24,7 +24,7 @@ body {
 	color: white;
 }
 
-.table-wrapper > table {
+.table-wrapper>table {
 	padding: 1rem;
 }
 
@@ -42,16 +42,27 @@ th {
 	counter-reset: line-number;
 }
 
-.code span {
+.code>span {
 	counter-increment: line-number;
 	display: list-item;
 	padding-left: 0.5rem;
 	margin-left: 2rem;
 }
 
-.code span::marker {
+.code>span::marker {
 	content: counter(line-number);
 	color: #aaa;
 }
 
-/* }行番号表示 */
+/* 文字種ハイライト */
+.console-digit {
+	color: chartreuse;
+}
+
+.console-symbol {
+	color: deepskyblue;
+}
+
+.console-upper {
+	color: darksalmon;
+}
