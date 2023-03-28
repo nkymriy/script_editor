@@ -12,6 +12,9 @@ $(window).on("load", function () {
 	initialize();
 });
 
+/**
+ * 初期化
+ */
 function initialize() {
 	$("input").off("click");
 	$("input").on("click", function () { update(); });
@@ -22,7 +25,7 @@ function initialize() {
 	})
 
 	$("#add-row-button").off("click");
-	$("#add-row-button").on("click", function () { addRow(); });
+	$("#add-row-button").on("click", function () { addCommandRow(); });
 
 	$("#save-button").off("click");
 	$("#save-button").on("click", function () { saveJson(); downloadJsonFile(); });
@@ -44,11 +47,17 @@ function initialize() {
 	update()
 }
 
+/**
+ * 画面更新
+ */
 function update() {
 	updateTable();
 	updateConsole();
 }
 
+/**
+ * コンソール(画面右)表示更新
+ */
 function updateConsole() {
 	$console = $(".console-space");
 	$console.text("");
@@ -104,6 +113,9 @@ function updateConsole() {
 	})
 }
 
+/**
+ * テーブル(画面左)更新
+ */
 function updateTable() {
 	let index = 1
 	$(".row").each(function () {
@@ -121,7 +133,10 @@ function updateTable() {
 	});
 }
 
-function addRow() {
+/**
+ * コマンド行の追加
+ */
+function addCommandRow() {
 	let id = $(".row").length + 1
 	var tr =
 		`<tr data-id="${id}" data-enabled="true" class="row">
@@ -131,11 +146,13 @@ function addRow() {
 			<td><input type="textbox" data-type="command"></td>
 			<td><input type="button" data-command="delete" value="X"></td>
 		`
-	$(tr).appendTo($(".sortable-list"));
+	$(tr).appendTo($(".command-list"));
 	initialize();
-	return;
 }
 
+/**
+ * JSONファイルを保存
+ */
 function saveJson() {
 	let jsonItem = tableToDict();
 	let isNewProfile = true;
@@ -154,6 +171,10 @@ function saveJson() {
 	}
 }
 
+/**
+ * コマンドテーブルを辞書化
+ * @returns コマンド辞書
+ */
 function tableToDict() {
 	let dict = {};
 	dict["profileId"] = $("#profile-id").val();
@@ -175,6 +196,9 @@ function tableToDict() {
 	return dict;
 }
 
+/**
+ * JSONファイル読込
+ */
 async function readJsonFile() {
 	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
 	const rowJsonFile = await fileHandle.getFile();
@@ -182,6 +206,9 @@ async function readJsonFile() {
 	readJson();
 }
 
+/**
+ * JSON読込+コマンドテーブル更新
+ */
 function readJson() {
 	let profiles = []
 	// 先にProfileを埋める(1回だけ)
@@ -199,6 +226,7 @@ function readJson() {
 		paramProfile = profiles[0];
 	}
 
+	// コマンド詰め込み
 	for (const item of jsonData.items) {
 		if (item.profileId == paramProfile) {
 			selectProfile = item.profileId;
@@ -218,15 +246,17 @@ function readJson() {
 					<td><input type="textbox" data-type="command" value="${command.command}"></td>
 					<td><input type="button" data-command="delete" value="X"></td>
 				`
-				$(tr).appendTo($(".sortable-list"));
+				$(tr).appendTo($(".command-list"));
 				index += 1;
 			}
 		}
 	}
 	initialize();
-	return;
 }
 
+/**
+ * プロファイル変更
+ */
 function changeProfile() {
 	let newProfile = $("#profile-list option:selected").val()
 	history.replaceState("", "", `?profile=${newProfile}`);
@@ -235,7 +265,9 @@ function changeProfile() {
 	readJson();
 }
 
-
+/**
+ * JSONファイルダウンロード
+ */
 function downloadJsonFile() {
 	const blob = new Blob([JSON.stringify(jsonData)]);
 
@@ -245,7 +277,9 @@ function downloadJsonFile() {
 	link.click();
 }
 
-
+/**
+ * JSONファイル更新
+ */
 async function updateJsonFile() {
 	// [fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
 	// const file = await fileHandle.getFile();
@@ -255,10 +289,18 @@ async function updateJsonFile() {
 	toast("保存しました！");
 }
 
+/**
+ * 行削除
+ * @param {*} object 行データ(HTML)
+ */
 function deleteRow(object) {
 	object.parent().parent().remove();
 }
 
+/**
+ * プロファイル削除
+ * @returns 
+ */
 function deleteProfile() {
 	if (confirm("プロファイルを本当に削除してOK？") == false) return;
 
@@ -273,11 +315,19 @@ function deleteProfile() {
 	updateJsonFile();
 }
 
+/**
+ * string自身をHTMLタグで囲む
+ * @param {*} htmlTag 
+ * @returns HTMLタグ
+ */
 String.prototype.wrapHtmlTag = function (htmlTag) {
 	return `<${htmlTag}>${this}</${htmlTag}>`;
 }
 
-
+/**
+ * トースト
+ * @param {*} msg 表示テキスト
+ */
 function toast(msg) {
 
 	$.toast({
