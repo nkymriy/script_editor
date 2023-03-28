@@ -55,6 +55,7 @@ th {
 /* 行番号表示{ */
 .code {
 	counter-reset: line-number;
+	padding-top: 0.5rem;
 }
 
 .code>span {
