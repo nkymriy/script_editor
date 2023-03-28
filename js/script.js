@@ -174,7 +174,6 @@ function updateTable() {
  * コンソールヘッダ更新
  */
 function updateConsoleHeader(){
-	console.log(charCount($(".console-space").text()))
 	$("#charCount").text(charCount($(".console-space").text()));
 }
 
