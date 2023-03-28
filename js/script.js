@@ -187,6 +187,7 @@ function addExtendOptionRow() {
 	let id = $(".extend-option-row").length + 1
 	let tr =
 		`<tr data-id="${id}" data-enabled="true" class="extend-option-row">
+			<th class="draggable-area">　::　</th>
 			<th data-type="id">${id}</th>
 			<td><input type="checkbox" data-type="enabled" checked></td>
 			<td><input type="textbox" data-type="name"></td>
@@ -206,6 +207,7 @@ function addCommandRow() {
 	let id = $(".command-row").length + 1
 	let tr =
 		`<tr data-id="${id}" data-enabled="true" class="command-row">
+			<th class="draggable-area">　::　</th>
 			<th data-type="id">${id}</th>
 			<td><input type="checkbox" data-type="enabled" checked></td>
 			<td><input type="checkbox" data-type="ignoreExtendOption"></td>
@@ -327,6 +329,7 @@ function readJson() {
 			for (let extendOption of item.extendOptions) {
 				let tr =
 					`<tr class="extend-option-row" data-id="${extendOption.id}" data-enabled=${extendOption.enabled} data-name=${extendOption.name} data-description=${extendOption.description} data-enabledTitle=${extendOption.enabledTitle} data-enabledCommand=${extendOption.enabledCommand}>
+				<th class="draggable-area">　::　</th>
 				<th data-type="id">${extendOption.id}</th>
 				<td><input type="checkbox" data-type="enabled" ${extendOption.enabled ? "checked" : ""}></td>
 				<td><input type="textbox" data-type="name"></td>
@@ -345,6 +348,7 @@ function readJson() {
 			for (const command of item.commands) {
 				let tr =
 					`<tr class="command-row" data-id="${command.id}" data-enabled=${command.enabled} data-title="${command.title}" data-command="${command.command}">
+					<th class="draggable-area">　::　</th>
 					<th data-type="id">${command.id}</th>
 					<td><input type="checkbox" data-type="enabled" ${command.enabled ? "checked" : ""}></td>
 					<td><input type="checkbox" data-type="ignoreExtendOption" ${command.ignoreExtendOption ? "checked" : ""}></td>

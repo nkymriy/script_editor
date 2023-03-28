@@ -81,3 +81,11 @@ th {
 .console-upper {
 	color: darksalmon;
 }
+
+.draggable-area:hover {
+	cursor: grab;
+}
+
+.draggable-area:active {
+	cursor: grabbing;
+}
