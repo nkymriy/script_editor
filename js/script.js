@@ -60,45 +60,47 @@ function updateConsole() {
 		}
 
 		let command = "";
+		let tmpCommand = "";
 		let isOutputFile = $("#is-output-file").is(":checked");
 		let row = $(this).data();
 		// タイトルecho
 		if (row.title && $("#is-output-title").is(":checked")) {
-			command += `${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}`
+			tmpCommand += `${$("#echo-title-before").val()}${row.title}${$("#echo-title-after").val()}`
 			// ファイル出力
 			if (isOutputFile) {
-				command += " >> " + output_file;
+				tmpCommand += " >> " + output_file;
 			}
-			command += `<br>`
+			command += tmpCommand.wrapHtmlTag("span");
 		}
 
 		// コマンドecho
 		if (row.command && $("#is-echo-command").is(":checked")) {
-			command += `echo '${row.command}'`
+			tmpCommand = `echo '${row.command}'`
 			// ファイル出力
 			if (isOutputFile) {
-				command += " >> " + output_file;
+				tmpCommand += " >> " + output_file;
 			}
-			command += `<br>`
+			command += tmpCommand.wrapHtmlTag("span")
 		}
 
 		// コマンド取得
 		if (row.command) {
-			command += $(this).find("[data-type='command']").val();
+			tmpCommand = $(this).find("[data-type='command']").val();
 			// ファイル出力
 			if (isOutputFile) {
-				command += " >> " + output_file;
+				tmpCommand += " >> " + output_file;
 			}
+			command += tmpCommand.wrapHtmlTag("span")
 		}
 
 		// 最終行の場合に改行 or 次行にタイトルが入力されている場合に改行
 		let nextRow = $(`[data-id='${row.id + 1}']`).data();
 		if (!nextRow || nextRow && nextRow.title != "") {
 			if ($("#is-after-newline").is(":checked")) {
-				command += `<br>`.repeat($("#after-newline-count").val());
+				command += `\n`.wrapHtmlTag("span").repeat($("#after-newline-count").val());
 			}
 		}
-		$console.html($console.html() + command + "<br>");
+		$console.html($console.html() + command);
 	})
 }
 
@@ -146,8 +148,8 @@ function saveJson() {
 			return false;
 		}
 	})
-	
-	if(isNewProfile){
+
+	if (isNewProfile) {
 		jsonData.items.push(jsonItem);
 	}
 }
@@ -173,7 +175,7 @@ function tableToDict() {
 	return dict;
 }
 
-async function readJsonFile(){
+async function readJsonFile() {
 	[fileHandle] = await window.showOpenFilePicker({ types: [{ accept: { "text/json": [".json"] } }] });
 	const rowJsonFile = await fileHandle.getFile();
 	jsonData = JSON.parse(await rowJsonFile.text());
@@ -185,15 +187,15 @@ function readJson() {
 	// 先にProfileを埋める(1回だけ)
 	for (const item of jsonData.items) {
 		profiles.push(item.profileId);
-		if($(`#profile-list option[data-profile='${item.profileId}']`).length == 0){
+		if ($(`#profile-list option[data-profile='${item.profileId}']`).length == 0) {
 			$("#profile-list").append($(`<option data-profile='${item.profileId}'>`).html(`${item.profileId}:${item.profileName}`).val(item.profileId));
 		}
 	}
-	
+
 	let paramProfile = new URL(location.href).searchParams.get("profile");
 	// Getparamで選択されていないか存在しない場合
-	if(!paramProfile || !profiles.includes(paramProfile)){
-		history.replaceState("","",`?profile=${profiles[0]}`);
+	if (!paramProfile || !profiles.includes(paramProfile)) {
+		history.replaceState("", "", `?profile=${profiles[0]}`);
 		paramProfile = profiles[0];
 	}
 
@@ -201,7 +203,7 @@ function readJson() {
 		if (item.profileId == paramProfile) {
 			selectProfile = item.profileId;
 			// getパラメータを更新
-			history.replaceState("","",`?profile=${item.profileId}`);
+			history.replaceState("", "", `?profile=${item.profileId}`);
 
 			$("#profile-id").val(item.profileId);
 			$("#profile-name").val(item.profileName);
@@ -225,9 +227,9 @@ function readJson() {
 	return;
 }
 
-function changeProfile(){
+function changeProfile() {
 	let newProfile = $("#profile-list option:selected").val()
-	history.replaceState("","",`?profile=${newProfile}`);
+	history.replaceState("", "", `?profile=${newProfile}`);
 	// テーブルをクリア
 	$(".row").remove();
 	readJson();
@@ -257,9 +259,9 @@ function deleteRow(object) {
 	object.parent().parent().remove();
 }
 
-function deleteProfile(){
-	if(confirm("プロファイルを本当に削除してOK？") == false) return;
-	
+function deleteProfile() {
+	if (confirm("プロファイルを本当に削除してOK？") == false) return;
+
 	// 指定されているIDの部分を削除
 	jsonData.items.forEach(function (item, index) {
 		if (item.profileId == $("#profile-id").val()) {
@@ -270,6 +272,11 @@ function deleteProfile(){
 	// 上書き保存させる
 	updateJsonFile();
 }
+
+String.prototype.wrapHtmlTag = function (htmlTag) {
+	return `<${htmlTag}>${this}</${htmlTag}>`;
+}
+
 
 function toast(msg) {
 

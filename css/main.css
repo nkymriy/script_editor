@@ -1,11 +1,18 @@
+body {
+	margin: 0;
+}
+
 .wrapper {
 	display: flex;
+	height: 100%;
 }
 
 .column {
 	width: 50%;
-	height: 100vh;
+	height: auto;
+	/* height: 100vh; */
 	border: 5px double lightsteelblue;
+	overflow-y: scroll;
 }
 
 .left-column {
@@ -15,10 +22,6 @@
 .right-column {
 	background-color: black;
 	color: white;
-}
-
-.console-space {
-	padding-left: 10px;
 }
 
 #command-table {
@@ -33,3 +36,21 @@ td,
 th {
 	border: 1px black solid;
 }
+
+/* 行番号表示{ */
+.code {
+	counter-reset: line-number;
+}
+
+.code span {
+	counter-increment: line-number;
+	display: list-item;
+	padding-left: 0.5rem;
+	margin-left: 2rem;
+}
+
+.code span::marker {
+	content: counter(line-number);
+	color: #aaa;
+}
+/* }行番号表示 */
